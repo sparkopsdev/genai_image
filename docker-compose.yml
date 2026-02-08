@@ -1,0 +1,35 @@
+services:
+  sd-notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sd-notebook
+    ports:
+      - "8888:8888"
+    environment:
+      - HF_HOME=/workspace/.cache/huggingface
+      - TRANSFORMERS_CACHE=/workspace/.cache/huggingface/transformers
+      - HF_DATASETS_CACHE=/workspace/.cache/huggingface/datasets
+      - TORCH_HOME=/workspace/.cache/torch
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN}
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ./:/workspace
+      - hf_cache:/workspace/.cache
+    working_dir: /workspace
+    command: >
+      bash -lc "
+      jupyter lab
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --ServerApp.token=${JUPYTER_TOKEN}
+      --ServerApp.allow_remote_access=True
+      --ServerApp.disable_check_xsrf=True
+      --ServerApp.allow_origin='*'
+      --ServerApp.websocket_compression=False
+      --allow-root
+      "
+
+volumes:
+  hf_cache:
